@@ -6,6 +6,7 @@ import LoginPage from "./pages/LoginPage";
 import ProjectPage from "./pages/ProjectPage";
 import TaskPage from "./pages/TaskPage";
 import ConvasPage from "./pages/convas";
+import GridHighlight from "./pages/gridhightlight";
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
           <Route path="assets" element={<AssetPage />} />
           <Route path="tasks" element={<TaskPage />} />
           <Route path="convas" element={<ConvasPage />} />
+          <Route path="gridhightlight" element={<GridHighlight />} />
+
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

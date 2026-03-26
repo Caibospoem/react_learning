@@ -9,6 +9,7 @@ function Layout() {
     { path: "/assets", label: "资源管理" },
     { path: "/tasks", label: "任务中心" },
     { path: "/convas", label: "Canvas 编辑" },
+    { path: "/gridhightlight", label: "格子高亮" },
   ];
 
   return (
