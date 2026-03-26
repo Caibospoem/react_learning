@@ -1,19 +1,57 @@
-import { useState } from "react";
-import { mockAssets } from "../mock/data";
+import { useEffect, useState } from "react";
+import { getAssetsApi, uploadAssetApi } from "../services/assetApi";
+import type { Asset } from "../types";
 
 function AssetPage() {
-  const [assets, setAssets] = useState(mockAssets);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleDelete = (id: number) => {
-    const nextList = assets.filter((item) => item.id !== id);
-    setAssets(nextList);
+  const fetchAssets = async () => {
+    try {
+      const data = await getAssetsApi();
+      setAssets(data);
+    } catch (error) {
+      console.error(error);
+      alert("获取资源列表失败");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchAssets();
+  }, []);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await uploadAssetApi(file);
+      alert("上传成功");
+      fetchAssets();
+    } catch (error) {
+      console.error(error);
+      alert("上传失败");
+    }
+  };
+
+  if (loading) {
+    return <div>加载中...</div>;
+  }
 
   return (
     <div>
       <div className="page-header">
         <h1>资源管理</h1>
-        <button className="btn primary">上传资源</button>
+        <label className="btn primary">
+          上传资源
+          <input
+            type="file"
+            style={{ display: "none" }}
+            onChange={handleUpload}
+          />
+        </label>
       </div>
 
       <div className="table">
@@ -28,14 +66,10 @@ function AssetPage() {
         {assets.map((asset) => (
           <div key={asset.id} className="table-row">
             <span>{asset.name}</span>
-            <span>{asset.type}</span>
-            <span>{asset.size}</span>
-            <span>{asset.projectName}</span>
-            <span>
-              <button className="btn danger" onClick={() => handleDelete(asset.id)}>
-                删除
-              </button>
-            </span>
+            <span>{asset.type ?? "-"}</span>
+            <span>{asset.size ?? "-"}</span>
+            <span>{asset.projectName ?? "-"}</span>
+            <span>-</span>
           </div>
         ))}
       </div>

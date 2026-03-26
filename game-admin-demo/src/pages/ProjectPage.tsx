@@ -1,22 +1,46 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProjectCard from "../components/ProjectCard";
-import { mockProjects } from "../mock/data";
-import type { ProjectStatus } from "../types";
+import { getProjectsApi } from "../services/projectApi";
+import type { Project, ProjectStatus } from "../types";
 
 function ProjectPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<"全部" | ProjectStatus>("全部");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const data = await getProjectsApi();
+        setProjects(data);
+      } catch (error) {
+        console.error(error);
+        alert("获取项目列表失败");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const filteredProjects = useMemo(() => {
-    return mockProjects.filter((project) => {
+    return projects.filter((project) => {
       const matchKeyword =
-        project.name.includes(keyword) || project.description.includes(keyword);
+        project.name.includes(keyword) ||
+        project.description.includes(keyword);
 
-      const matchStatus = status === "全部" ? true : project.status === status;
+      const matchStatus =
+        status === "全部" ? true : project.status === status;
 
       return matchKeyword && matchStatus;
     });
-  }, [keyword, status]);
+  }, [projects, keyword, status]);
+
+  if (loading) {
+    return <div>加载中...</div>;
+  }
 
   return (
     <div>
@@ -36,9 +60,7 @@ function ProjectPage() {
         <select
           className="input"
           value={status}
-          onChange={(e) =>
-            setStatus(e.target.value as "全部" | ProjectStatus)
-          }
+          onChange={(e) => setStatus(e.target.value as "全部" | ProjectStatus)}
         >
           <option value="全部">全部状态</option>
           <option value="进行中">进行中</option>

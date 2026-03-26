@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { loginApi } from "../services/authApi";
 
 function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (!username || !password) {
-      alert("请输入用户名和密码");
-      return;
+  const handleLogin = async () => {
+    try {
+      const res = await loginApi({ username, password });
+      localStorage.setItem("token", res.access_token);
+      localStorage.setItem("username", username);
+      navigate("/projects");
+    } catch (error) {
+      console.error(error);
+      alert("登录失败，请检查用户名或密码");
     }
-
-    navigate("/projects");
   };
 
   return (
