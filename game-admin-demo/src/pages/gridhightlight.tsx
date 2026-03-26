@@ -66,9 +66,7 @@ function GridHighlight() {
         ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE)
     }
 
-    const redraw = (
-        selectedCell: { row: number; col: number } | null
-    ) => {
+    const redraw = () => {
         const canvas = canvasRef.current
         if (!canvas) return
 
@@ -82,17 +80,19 @@ function GridHighlight() {
 
         drawGrid(ctx, canvas.width, canvas.height)
 
+        if (hoverCell) {
+            drawHoverCell(ctx, hoverCell.row, hoverCell.col)
+        }
+
         if (selectedCell) {
             drawSelectedCell(ctx, selectedCell.row, selectedCell.col)
         }
 
-        if (hoverCell) {
-            drawHoverCell(ctx, hoverCell.row, hoverCell.col)
-        }
+
     }
 
     useEffect(() => {
-        redraw(selectedCell)
+        redraw()
     }, [selectedCell, hoverCell])
 
 
