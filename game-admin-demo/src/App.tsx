@@ -5,6 +5,7 @@ import AssetPage from "./pages/AssetPage";
 import LoginPage from "./pages/LoginPage";
 import ProjectPage from "./pages/ProjectPage";
 import TaskPage from "./pages/TaskPage";
+import ConvasPage from "./pages/convas";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="projects" element={<ProjectPage />} />
           <Route path="assets" element={<AssetPage />} />
           <Route path="tasks" element={<TaskPage />} />
+          <Route path="convas" element={<ConvasPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
