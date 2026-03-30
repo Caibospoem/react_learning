@@ -143,8 +143,8 @@ function GridHighlight() {
             <h1>Day 3 - 网格系统与坐标映射</h1>
             <p>
                 当前选中：
-                {selectedCell
-                    ? `第 ${selectedCell.row} 行，第 ${selectedCell.col} 列`
+                {hoverCell
+                    ? `第 ${hoverCell.row + 1} 行，第 ${hoverCell.col + 1} 列`
                     : '未选中'}
             </p>
 
