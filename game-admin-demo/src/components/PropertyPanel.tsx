@@ -19,7 +19,7 @@ function PropertyPanel({
   return (
     <div
       style={{
-        width: 260,
+        width: 270,
         borderLeft: '1px solid #e5e7eb',
         background: '#fafafa',
         padding: 16,
@@ -40,8 +40,16 @@ function PropertyPanel({
           当前 hover 格子：
           <strong>
             {hoverCell
-              ? ` 第 ${hoverCell.row + 1} 行，第 ${hoverCell.col + 1} 列`
-              : ' 未选中'}
+              ? `第 ${hoverCell.row + 1} 行，第 ${hoverCell.col + 1} 列`
+              : '未选中'}
+          </strong>
+        </div>
+        <div>
+          当前 hover 素材：
+          <strong>
+            {hoverCell
+              ? mapData.cells[`${hoverCell.row}-${hoverCell.col}`] || '空'
+              : '未选中'}
           </strong>
         </div>
         <hr />

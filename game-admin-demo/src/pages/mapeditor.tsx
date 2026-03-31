@@ -44,7 +44,10 @@ function MapEditor() {
         <AssetPanel
           tileAssets={tileAssets}
           selectedTileId={selectedTileId}
-          onSelectTile={(tileId) => setSelectedTileId(tileId)}
+          onSelectTile={(tileId) => {
+            setSelectedTileId(tileId)
+            setIsEraseMode(false)
+          }}
         />
 
         <div
