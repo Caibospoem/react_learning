@@ -215,6 +215,20 @@ function tilesput() {
                 >
                     {isEraseMode ? '擦除模式✅' : '绘制模式' }
                 </button>
+                <button
+                    onClick={() =>
+                        setMapData(createEmptyMapData(mapdata.rows, mapdata.cols, mapdata.tileSize))
+                    }
+                    style={{
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        border: '1px solid #ccc',
+                        background: '#fff',
+                        cursor: 'pointer',
+                    }}
+                    >
+                    清空地图
+                </button>
             </div>
 
             <p style={{ marginBottom: 12 }}>
