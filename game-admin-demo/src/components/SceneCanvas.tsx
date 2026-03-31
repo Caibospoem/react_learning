@@ -6,16 +6,10 @@ interface SceneCanvasProps {
   mapData: MapData
   setMapData: React.Dispatch<React.SetStateAction<MapData>>
   selectedTileId: string
-  hoverCell: {
-    row: number
-    col: number
-  } | null
-  setHoverCell: React.Dispatch<
-    React.SetStateAction<{
-      row: number
-      col: number
-    } | null>
-  >
+  hoverCell: { row: number; col: number } | null
+  setHoverCell: React.Dispatch<React.SetStateAction<{ row: number; col: number } | null>>
+  selectedCell: { row: number; col: number } | null
+  setSelectedCell: React.Dispatch<React.SetStateAction<{ row: number; col: number } | null>>
   isEraseMode: boolean
   tileAssets: TileAsset[]
 }
@@ -26,6 +20,8 @@ function SceneCanvas({
   selectedTileId,
   hoverCell,
   setHoverCell,
+  selectedCell,
+  setSelectedCell,
   isEraseMode,
   tileAssets,
 }: SceneCanvasProps) {
@@ -63,6 +59,19 @@ function SceneCanvas({
       ctx.stroke()
     }
   }
+
+  const drawSelectedCell = (
+    ctx: CanvasRenderingContext2D,
+    row: number,
+    col: number
+    ) => {
+    const x = col * mapData.tileSize
+    const y = row * mapData.tileSize
+
+    ctx.strokeStyle = '#ff4d4f'
+    ctx.lineWidth = 2
+    ctx.strokeRect(x, y, mapData.tileSize, mapData.tileSize)
+    }
 
   const drawHoverCell = (
     ctx: CanvasRenderingContext2D,
@@ -117,11 +126,15 @@ function SceneCanvas({
     if (hoverCell) {
       drawHoverCell(ctx, hoverCell.row, hoverCell.col)
     }
+
+    if (selectedCell) {
+      drawSelectedCell(ctx, selectedCell.row, selectedCell.col)
+    }
   }
 
   useEffect(() => {
     redraw()
-  }, [mapData, imageMap, hoverCell])
+  }, [mapData, imageMap, hoverCell, selectedCell])
 
   useEffect(() => {
     const images = Object.values(imageMap)
@@ -144,48 +157,43 @@ function SceneCanvas({
     redraw()
   }, [imageMap])
 
-  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
 
-    const rect = canvas.getBoundingClientRect()
-    const mouseX = event.clientX - rect.left
-    const mouseY = event.clientY - rect.top
+  const getCellFromMouseEvent = (event: React.MouseEvent<HTMLCanvasElement>) => {
+        const canvas = canvasRef.current
+        if (!canvas) return null
 
-    const col = Math.floor(mouseX / mapData.tileSize)
-    const row = Math.floor(mouseY / mapData.tileSize)
+        const rect = canvas.getBoundingClientRect()
+        const mouseX = event.clientX - rect.left
+        const mouseY = event.clientY - rect.top
 
-    if (col < 0 || col >= mapData.cols || row < 0 || row >= mapData.rows) {
-      return
+        const col = Math.floor(mouseX / mapData.tileSize)
+        const row = Math.floor(mouseY / mapData.tileSize)
+
+        if (col < 0 || col >= mapData.cols || row < 0 || row >= mapData.rows) {
+            return null
+        }
+
+        return { row, col }
     }
+  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    const cell = getCellFromMouseEvent(event)
+    if (!cell) return
 
-    const key = `${row}-${col}`
+    setSelectedCell(cell)
+
+    const key = `${cell.row}-${cell.col}`
     const currentTile = mapData.cells[key]
 
     if (isEraseMode || currentTile === selectedTileId) {
-      setMapData((prev) => removeTileAtCell(prev, row, col))
+      setMapData((prev) => removeTileAtCell(prev, cell.row, cell.col))
     } else {
-      setMapData((prev) => setTileAtCell(prev, row, col, selectedTileId))
+      setMapData((prev) => setTileAtCell(prev, cell.row, cell.col, selectedTileId))
     }
   }
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const rect = canvas.getBoundingClientRect()
-    const mouseX = event.clientX - rect.left
-    const mouseY = event.clientY - rect.top
-
-    const col = Math.floor(mouseX / mapData.tileSize)
-    const row = Math.floor(mouseY / mapData.tileSize)
-
-    if (col < 0 || col >= mapData.cols || row < 0 || row >= mapData.rows) {
-      setHoverCell(null)
-      return
-    }
-
-    setHoverCell({ row, col })
+    const cell = getCellFromMouseEvent(event)
+    setHoverCell(cell)
   }
 
   return (

@@ -18,6 +18,10 @@ const tileAssets: TileAsset[] = [
 
 function MapEditor() {
   const [selectedTileId, setSelectedTileId] = useState<string>('water')
+  const [selectedCell, setSelectedCell] = useState<{
+    row: number
+    col: number
+  } | null>(null)
   const [hoverCell, setHoverCell] = useState<{
     row: number
     col: number
@@ -66,6 +70,8 @@ function MapEditor() {
             selectedTileId={selectedTileId}
             hoverCell={hoverCell}
             setHoverCell={setHoverCell}
+            selectedCell={selectedCell}
+            setSelectedCell={setSelectedCell}
             isEraseMode={isEraseMode}
             tileAssets={tileAssets}
           />
@@ -74,6 +80,7 @@ function MapEditor() {
         <PropertyPanel
           selectedTileId={selectedTileId}
           hoverCell={hoverCell}
+          selectedCell={selectedCell}
           mapData={mapData}
           isEraseMode={isEraseMode}
         />

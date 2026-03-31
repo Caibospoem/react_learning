@@ -1,11 +1,10 @@
 import type { MapData } from '../types/map'
+import { getCellKey } from '../utils/map'
 
 interface PropertyPanelProps {
   selectedTileId: string
-  hoverCell: {
-    row: number
-    col: number
-  } | null
+  hoverCell: { row: number; col: number } | null
+  selectedCell: { row: number; col: number } | null
   mapData: MapData
   isEraseMode: boolean
 }
@@ -13,13 +12,18 @@ interface PropertyPanelProps {
 function PropertyPanel({
   selectedTileId,
   hoverCell,
+  selectedCell,
   mapData,
   isEraseMode,
 }: PropertyPanelProps) {
+  const selectedTileInCell = selectedCell
+    ? mapData.cells[getCellKey(selectedCell.row, selectedCell.col)] ?? null
+    : null
+
   return (
     <div
       style={{
-        width: 270,
+        width: 260,
         borderLeft: '1px solid #e5e7eb',
         background: '#fafafa',
         padding: 16,
@@ -40,19 +44,25 @@ function PropertyPanel({
           当前 hover 格子：
           <strong>
             {hoverCell
-              ? `第 ${hoverCell.row + 1} 行，第 ${hoverCell.col + 1} 列`
-              : '未选中'}
+              ? ` 第 ${hoverCell.row + 1} 行，第 ${hoverCell.col + 1} 列`
+              : ' 无'}
           </strong>
         </div>
         <div>
-          当前 hover 素材：
+          当前选中格子：
           <strong>
-            {hoverCell
-              ? mapData.cells[`${hoverCell.row}-${hoverCell.col}`] || '空'
-              : '未选中'}
+            {selectedCell
+              ? ` 第 ${selectedCell.row + 1} 行，第 ${selectedCell.col + 1} 列`
+              : ' 无'}
           </strong>
         </div>
+        <div>
+          选中格子内容：
+          <strong>{selectedTileInCell ?? '空'}</strong>
+        </div>
+
         <hr />
+
         <div>地图行数：{mapData.rows}</div>
         <div>地图列数：{mapData.cols}</div>
         <div>格子大小：{mapData.tileSize}</div>
