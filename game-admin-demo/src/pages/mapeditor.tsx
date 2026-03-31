@@ -11,9 +11,9 @@ const COLS = 20
 const ROWS = 15
 
 const tileAssets: TileAsset[] = [
-  { id: 'grass', name: '草地', src: '/tiles/grass.png' },
-  { id: 'water', name: '水面', src: '/tiles/water.png' },
-  { id: 'wall', name: '墙体', src: '/tiles/wall.png' },
+  { id: 'grass', name: '草地', src: '/tiles/grass.png', description: '基础地表' },
+  { id: 'water', name: '水面', src: '/tiles/water.png', description: '不可通行区域' },
+  { id: 'wall', name: '墙体', src: '/tiles/wall.png', description: '阻挡物' },
 ]
 
 function MapEditor() {
@@ -44,6 +44,7 @@ function MapEditor() {
         <AssetPanel
           tileAssets={tileAssets}
           selectedTileId={selectedTileId}
+          isEraseMode={isEraseMode}
           onSelectTile={(tileId) => {
             setSelectedTileId(tileId)
             setIsEraseMode(false)

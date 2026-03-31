@@ -9,4 +9,5 @@ export interface TileAsset {
     id: string
     name: string
     src: string
+    description?: string
 }
