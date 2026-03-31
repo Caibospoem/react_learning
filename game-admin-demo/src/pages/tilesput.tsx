@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { MapData } from '../types/map'
+import { setTileAtCell, createEmptyMapData, removeTileAtCell } from '../utils/map'
 
 const TILE_SIZE = 32
 const COLS = 20
@@ -10,26 +12,26 @@ const tileAssets = [
     { id: 'wall', name: '墙体', src: '/tiles/wall.png' },
 ]
 
-    function tilesput() {
-        const canvasRef = useRef<HTMLCanvasElement | null>(null)
+function tilesput() {
+    const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
-        const [selectedTileId, setSelectedTileId] = useState<string>('water')
-        const [hoverCell, setHoverCell] = useState<{
-            row: number
-            col: number
-        } | null>(null)
-        const [placedTiles, setPlacedTiles] = useState<Record<string, string>>({})
+    const [selectedTileId, setSelectedTileId] = useState<string>('water')
+    const [hoverCell, setHoverCell] = useState<{
+        row: number
+        col: number
+    } | null>(null)
+    const [mapdata, setMapData] = useState<MapData>(createEmptyMapData(ROWS, COLS, TILE_SIZE))
+    const [isEraseMode, setIsEraseMode] = useState(false)
+    const imageMap = useMemo(() => {
+        const map: Record<string, HTMLImageElement> = {}
 
-        const imageMap = useMemo(() => {
-            const map: Record<string, HTMLImageElement> = {}
+        tileAssets.forEach((asset) => {
+            const img = new Image()
+            img.src = asset.src
+            map[asset.id] = img
+        })
 
-            tileAssets.forEach((asset) => {
-                const img = new Image()
-                img.src = asset.src
-                map[asset.id] = img
-            })
-
-            return map
+        return map
     }, [])
 
     const drawGrid = (ctx: CanvasRenderingContext2D) => {
@@ -67,7 +69,7 @@ const tileAssets = [
 
 
     const drawTiles = (ctx: CanvasRenderingContext2D) => {
-        Object.entries(placedTiles).forEach(([key, tileId]) => {
+        Object.entries(mapdata.cells).forEach(([key, tileId]) => {
             const [rowStr, colStr] = key.split('-')
             const row = Number(rowStr)
             const col = Number(colStr)
@@ -75,7 +77,7 @@ const tileAssets = [
             const x = col * TILE_SIZE
             const y = row * TILE_SIZE
 
-            const img = imageMap[tileId]
+            const img = imageMap[String(tileId)]
             if (img && img.complete) {
                 ctx.drawImage(img, x, y, TILE_SIZE, TILE_SIZE)
             } else {
@@ -85,7 +87,7 @@ const tileAssets = [
 
                 ctx.fillStyle = '#333'
                 ctx.font = '10px sans-serif'
-                ctx.fillText(tileId, x + 2, y + 16)
+                ctx.fillText(String(tileId), x + 2, y + 16)
             }
         })
     }
@@ -110,9 +112,12 @@ const tileAssets = [
         }
     }
 
+
+    
+
     useEffect(() => {
         redraw()
-    }, [placedTiles, imageMap, hoverCell])
+    }, [mapdata, imageMap, hoverCell])
 
     useEffect(() => {
         const images = Object.values(imageMap)
@@ -149,11 +154,13 @@ const tileAssets = [
         if (col < 0 || col >= COLS || row < 0 || row >= ROWS) return
 
         const key = `${row}-${col}`
+        const currentTile = mapdata.cells[key]
 
-        setPlacedTiles((prev) => ({
-            ...prev,
-            [key]: selectedTileId,
-        }))
+        if (isEraseMode || currentTile === selectedTileId) {
+            setMapData((prev) => removeTileAtCell(prev, row, col))
+        } else {
+            setMapData((prev) => setTileAtCell(prev, row, col, selectedTileId))
+        }
     }
 
     const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -195,6 +202,19 @@ const tileAssets = [
                         {asset.name}
                     </button>
                 ))}
+                <button
+                    onClick={() => setIsEraseMode((v) => !v)}
+                    style={{
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        border: '1px solid #ccc',
+                        background: isEraseMode ? '#fff1f0' : '#f6ffed',
+                        color: isEraseMode ? '#cf1322' : '#389e0d',
+                        cursor: 'pointer',
+                    }}
+                >
+                    {isEraseMode ? '擦除模式✅' : '绘制模式' }
+                </button>
             </div>
 
             <p style={{ marginBottom: 12 }}>
