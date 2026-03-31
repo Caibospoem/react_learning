@@ -216,9 +216,10 @@ function tilesput() {
                     {isEraseMode ? '擦除模式✅' : '绘制模式' }
                 </button>
                 <button
-                    onClick={() =>
+                    onClick={() => {
                         setMapData(createEmptyMapData(mapdata.rows, mapdata.cols, mapdata.tileSize))
-                    }
+                        setHoverCell(null)
+                    }}
                     style={{
                         padding: '8px 12px',
                         borderRadius: 6,
