@@ -10,7 +10,7 @@ function Layout() {
     { path: "/tasks", label: "任务中心" },
     { path: "/convas", label: "Canvas 编辑" },
     { path: "/gridhightlight", label: "格子高亮" },
-    { path: "/tilesput", label: "地图编辑" },
+    { path: "/mapeditor", label: "地图编辑器" },
   ];
 
   return (

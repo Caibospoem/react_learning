@@ -7,7 +7,7 @@ import ProjectPage from "./pages/ProjectPage";
 import TaskPage from "./pages/TaskPage";
 import ConvasPage from "./pages/convas";
 import GridHighlight from "./pages/gridhightlight";
-import TilesPut from "./pages/tilesput";
+import Mapeditor from "./pages/mapeditor";
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
           <Route path="tasks" element={<TaskPage />} />
           <Route path="convas" element={<ConvasPage />} />
           <Route path="gridhightlight" element={<GridHighlight />} />
-          <Route path="tilesput" element={<TilesPut />} />
+          <Route path="mapeditor" element={<Mapeditor />} />
 
         </Route>
 
