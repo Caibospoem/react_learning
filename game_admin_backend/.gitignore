@@ -1,0 +1,5 @@
+venv/
+__pycache__/
+.pytest_cache/
+tests/test_game_admin.db
+pytest-cache-files-*

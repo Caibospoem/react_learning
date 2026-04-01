@@ -72,7 +72,7 @@ function MapEditor() {
       setSelectedCell(null)
       setImportError('')
       setImportSuccess('地图恢复成功')
-    } catch (error) {
+    } catch {
       setImportError('JSON 解析失败，请检查格式是否正确')
     }
   }

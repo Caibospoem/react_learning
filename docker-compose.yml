@@ -1,0 +1,39 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: game-admin-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build:
+      context: ./game_admin_backend
+    container_name: game-admin-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: sqlite:////app/data/game_admin.db
+      REDIS_URL: redis://redis:6379/0
+      SECRET_KEY: dev_secret_key_change_me
+      ACCESS_TOKEN_EXPIRE_MINUTES: "120"
+      UPLOAD_DIR: /app/data/uploads
+    depends_on:
+      - redis
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_data:/app/data
+
+  frontend:
+    build:
+      context: ./game-admin-demo
+    container_name: game-admin-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  backend_data:
+  redis_data:
