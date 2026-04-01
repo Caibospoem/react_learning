@@ -11,3 +11,8 @@ export interface TileAsset {
     src: string
     description?: string
 }
+
+export interface GridCell {
+  row: number
+  col: number
+}

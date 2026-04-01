@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { MapData, TileAsset } from '../types/map'
+import type { MapData, TileAsset, GridCell } from '../types/map'
 import { createEmptyMapData } from '../utils/map'
 import Toolbar from '../components/Toolbar'
 import AssetPanel from '../components/AssetPanel'
@@ -18,14 +18,8 @@ const tileAssets: TileAsset[] = [
 
 function MapEditor() {
   const [selectedTileId, setSelectedTileId] = useState<string>('water')
-  const [selectedCell, setSelectedCell] = useState<{
-    row: number
-    col: number
-  } | null>(null)
-  const [hoverCell, setHoverCell] = useState<{
-    row: number
-    col: number
-  } | null>(null)
+  const [selectedCell, setSelectedCell] = useState<GridCell | null>(null)
+  const [hoverCell, setHoverCell] = useState<GridCell | null>(null)
   const [mapData, setMapData] = useState<MapData>(
     createEmptyMapData(ROWS, COLS, TILE_SIZE)
   )

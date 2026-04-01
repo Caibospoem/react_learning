@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useRef } from 'react'
-import type { MapData, TileAsset } from '../types/map'
+import type { MapData, TileAsset, GridCell } from '../types/map'
 import { removeTileAtCell, setTileAtCell } from '../utils/map'
+import { drawGrid, drawHoverCell, drawSelectedCell, drawTiles } from '../utils/canvas'
 
 interface SceneCanvasProps {
   mapData: MapData
   setMapData: React.Dispatch<React.SetStateAction<MapData>>
   selectedTileId: string
-  hoverCell: { row: number; col: number } | null
-  setHoverCell: React.Dispatch<React.SetStateAction<{ row: number; col: number } | null>>
-  selectedCell: { row: number; col: number } | null
-  setSelectedCell: React.Dispatch<React.SetStateAction<{ row: number; col: number } | null>>
+  hoverCell: GridCell | null
+  setHoverCell: React.Dispatch<React.SetStateAction<GridCell | null>>
+  selectedCell: GridCell | null
+  setSelectedCell: React.Dispatch<React.SetStateAction<GridCell | null>>
   isEraseMode: boolean
   tileAssets: TileAsset[]
   mode: 'edit' | 'preview'
@@ -41,75 +42,6 @@ function SceneCanvas({
     return map
   }, [tileAssets])
 
-  const drawGrid = (ctx: CanvasRenderingContext2D) => {
-    ctx.strokeStyle = '#d9d9d9'
-    ctx.lineWidth = 1
-
-    for (let col = 0; col <= mapData.cols; col++) {
-      const x = col * mapData.tileSize
-      ctx.beginPath()
-      ctx.moveTo(x, 0)
-      ctx.lineTo(x, mapData.rows * mapData.tileSize)
-      ctx.stroke()
-    }
-
-    for (let row = 0; row <= mapData.rows; row++) {
-      const y = row * mapData.tileSize
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(mapData.cols * mapData.tileSize, y)
-      ctx.stroke()
-    }
-  }
-
-  const drawSelectedCell = (
-    ctx: CanvasRenderingContext2D,
-    row: number,
-    col: number
-    ) => {
-    const x = col * mapData.tileSize
-    const y = row * mapData.tileSize
-
-    ctx.strokeStyle = '#ff4d4f'
-    ctx.lineWidth = 2
-    ctx.strokeRect(x, y, mapData.tileSize, mapData.tileSize)
-    }
-
-  const drawHoverCell = (
-    ctx: CanvasRenderingContext2D,
-    row: number,
-    col: number
-  ) => {
-    const x = col * mapData.tileSize
-    const y = row * mapData.tileSize
-
-    ctx.strokeStyle = '#1890ff'
-    ctx.strokeRect(x, y, mapData.tileSize, mapData.tileSize)
-  }
-
-  const drawTiles = (ctx: CanvasRenderingContext2D) => {
-    Object.entries(mapData.cells).forEach(([key, tileId]) => {
-      const [rowStr, colStr] = key.split('-')
-      const row = Number(rowStr)
-      const col = Number(colStr)
-
-      const x = col * mapData.tileSize
-      const y = row * mapData.tileSize
-
-      const img = imageMap[String(tileId)]
-      if (img && img.complete) {
-        ctx.drawImage(img, x, y, mapData.tileSize, mapData.tileSize)
-      } else {
-        ctx.fillStyle = '#eee'
-        ctx.fillRect(x, y, mapData.tileSize, mapData.tileSize)
-
-        ctx.fillStyle = '#333'
-        ctx.font = '10px sans-serif'
-        ctx.fillText(String(tileId), x + 2, y + 16)
-      }
-    })
-  }
-
   const redraw = () => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -122,17 +54,17 @@ function SceneCanvas({
     ctx.fillStyle = '#fff'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    drawTiles(ctx)
+    drawTiles(ctx, mapData, imageMap)
     if (mode === 'edit') {
-      drawGrid(ctx)
+      drawGrid(ctx, mapData)
     }
 
     if (mode === 'edit' && hoverCell) {
-      drawHoverCell(ctx, hoverCell.row, hoverCell.col)
+      drawHoverCell(ctx, mapData, hoverCell.row, hoverCell.col)
     }
 
     if (mode === 'edit' && selectedCell) {
-      drawSelectedCell(ctx, selectedCell.row, selectedCell.col)
+      drawSelectedCell(ctx, mapData, selectedCell.row, selectedCell.col)
     }
   }
 
@@ -162,7 +94,7 @@ function SceneCanvas({
   }, [imageMap])
 
 
-  const getCellFromMouseEvent = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const getGridCellFromMouseEvent = (event: React.MouseEvent<HTMLCanvasElement>): GridCell | null => {
         const canvas = canvasRef.current
         if (!canvas) return null
 
@@ -180,7 +112,7 @@ function SceneCanvas({
         return { row, col }
     }
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    const cell = getCellFromMouseEvent(event)
+    const cell = getGridCellFromMouseEvent(event)
     if (!cell) return
 
     setSelectedCell(cell)
@@ -198,7 +130,7 @@ function SceneCanvas({
   }
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    const cell = getCellFromMouseEvent(event)
+    const cell = getGridCellFromMouseEvent(event)
     setHoverCell(cell)
   }
 
