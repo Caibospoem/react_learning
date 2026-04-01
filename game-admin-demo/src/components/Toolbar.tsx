@@ -8,6 +8,8 @@ interface ToolbarProps {
   onClearMap: () => void
   onCreateNewMap: () => void
   onExportJson: () => void
+  mode: 'edit' | 'preview'
+  onToggleMode: () => void
 }
 
 function Toolbar({
@@ -20,6 +22,9 @@ function Toolbar({
   onClearMap,
   onCreateNewMap,
   onExportJson,
+  mode,
+  onToggleMode
+
 }: ToolbarProps) {
   return (
     <div
@@ -48,6 +53,19 @@ function Toolbar({
         }}
       >
         导出 JSON
+      </button>
+      <button 
+        onClick={onToggleMode}
+          style={{
+            padding: '8px 12px',
+            borderRadius: 6,
+            border: '1px solid #ccc',
+            background: mode === 'preview' ? '#fff1f0' : '#f6ffed',
+            color: mode === 'preview' ? '#cf1322' : '#389e0d',
+            cursor: 'pointer',
+          }}
+        >
+        {mode === 'edit' ? '进入预览模式' : '返回编辑模式'}
       </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <label style={{ fontSize: 14 }}>

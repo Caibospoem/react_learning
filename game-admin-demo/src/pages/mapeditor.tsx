@@ -42,6 +42,8 @@ function MapEditor() {
     if (!exportedJson) return
     await navigator.clipboard.writeText(exportedJson)
   }
+  const [mode, setMode] = useState<'edit' | 'preview'>('edit')
+
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -69,98 +71,130 @@ function MapEditor() {
           setDraftCols(nextCols)
         }}
         onExportJson={handleExportJson}
+        mode={mode}
+        onToggleMode={() => setMode((m) => (m === 'edit' ? 'preview' : 'edit'))}
+        
       />
+      {
+        mode === 'edit' ? (
+          <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
+            <AssetPanel
+              tileAssets={tileAssets}
+              selectedTileId={selectedTileId}
+              isEraseMode={isEraseMode}
+              onSelectTile={(tileId) => {
+                setSelectedTileId(tileId)
+                setIsEraseMode(false)
+              }}
+            />
 
-      <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
-        <AssetPanel
-          tileAssets={tileAssets}
-          selectedTileId={selectedTileId}
-          isEraseMode={isEraseMode}
-          onSelectTile={(tileId) => {
-            setSelectedTileId(tileId)
-            setIsEraseMode(false)
-          }}
-        />
-
-        <div
-          style={{
-            flex: 1,
-            padding: 24,
-            overflow: 'auto',
-            background: '#f5f5f5',
-          }}
-        >
-          <h2 style={{ marginTop: 0 }}>Scene Canvas</h2>
-          <SceneCanvas
-            mapData={mapData}
-            setMapData={setMapData}
-            selectedTileId={selectedTileId}
-            hoverCell={hoverCell}
-            setHoverCell={setHoverCell}
-            selectedCell={selectedCell}
-            setSelectedCell={setSelectedCell}
-            isEraseMode={isEraseMode}
-            tileAssets={tileAssets}
-          />
-          {exportedJson && (
             <div
               style={{
-                marginTop: 16,
-                background: '#fff',
-                border: '1px solid #e5e7eb',
-                borderRadius: 8,
-                padding: 12,
+                flex: 1,
+                padding: 24,
+                overflow: 'auto',
+                background: '#f5f5f5',
               }}
             >
-              <div
-                style={{
-                  height: 72,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '0 20px',
-                  borderBottom: '1px solid #e5e7eb',
-                  background: '#fff',
-                  flexShrink: 0,
-                  gap: 16,
-                }}
-              >
-                <h3 style={{ marginTop: 0 }}>导出结果</h3>
-                <button
-                  onClick={handleCopyJson}
+              <h2 style={{ marginTop: 0 }}>Scene Canvas</h2>
+              <SceneCanvas
+                mapData={mapData}
+                setMapData={setMapData}
+                selectedTileId={selectedTileId}
+                hoverCell={hoverCell}
+                setHoverCell={setHoverCell}
+                selectedCell={selectedCell}
+                setSelectedCell={setSelectedCell}
+                isEraseMode={isEraseMode}
+                tileAssets={tileAssets}
+                mode={mode}
+              />
+              {exportedJson && (
+                <div
                   style={{
-                    padding: '8px 12px',
-                    borderRadius: 6,
-                    border: '1px solid #ccc',
+                    marginTop: 16,
                     background: '#fff',
-                    cursor: 'pointer',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: 8,
+                    padding: 12,
                   }}
-                  >复制 JSON</button>
-              </div>
-              <textarea
-                value={exportedJson}
-                readOnly
-                style={{
-                  width: '100%',
-                  minHeight: 240,
-                  fontFamily: 'monospace',
-                  fontSize: 13,
-                  lineHeight: 1.6,
-                  resize: 'vertical',
-                }}
+                >
+                  <div
+                    style={{
+                      height: 72,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0 20px',
+                      borderBottom: '1px solid #e5e7eb',
+                      background: '#fff',
+                      flexShrink: 0,
+                      gap: 16,
+                    }}
+                  >
+                    <h3 style={{ marginTop: 0 }}>导出结果</h3>
+                    <button
+                      onClick={handleCopyJson}
+                      style={{
+                        padding: '8px 12px',
+                        borderRadius: 6,
+                        border: '1px solid #ccc',
+                        background: '#fff',
+                        cursor: 'pointer',
+                      }}
+                      >复制 JSON</button>
+                  </div>
+                  <textarea
+                    value={exportedJson}
+                    readOnly
+                    style={{
+                      width: '100%',
+                      minHeight: 240,
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                      lineHeight: 1.6,
+                      resize: 'vertical',
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            <PropertyPanel
+              selectedTileId={selectedTileId}
+              hoverCell={hoverCell}
+              selectedCell={selectedCell}
+              mapData={mapData}
+              isEraseMode={isEraseMode}
+            />
+          </div>
+        ) : (
+          <div style={{ flex: 1, padding: 24, background: '#f5f5f5' }}>
+            <div
+              style={{
+                display: 'inline-block',
+                background: '#fff',
+                padding: 16,
+                borderRadius: 12,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+              }}
+            >
+              <SceneCanvas
+                mapData={mapData}
+                setMapData={setMapData}
+                selectedTileId={selectedTileId}
+                hoverCell={hoverCell}
+                setHoverCell={setHoverCell}
+                selectedCell={selectedCell}
+                setSelectedCell={setSelectedCell}
+                isEraseMode={isEraseMode}
+                tileAssets={tileAssets}
+                mode={mode}
               />
             </div>
-          )}
-        </div>
-
-        <PropertyPanel
-          selectedTileId={selectedTileId}
-          hoverCell={hoverCell}
-          selectedCell={selectedCell}
-          mapData={mapData}
-          isEraseMode={isEraseMode}
-        />
-      </div>
+          </div>
+        )
+      }
     </div>
   )
 }

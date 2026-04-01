@@ -12,6 +12,7 @@ interface SceneCanvasProps {
   setSelectedCell: React.Dispatch<React.SetStateAction<{ row: number; col: number } | null>>
   isEraseMode: boolean
   tileAssets: TileAsset[]
+  mode: 'edit' | 'preview'
 }
 
 function SceneCanvas({
@@ -24,6 +25,7 @@ function SceneCanvas({
   setSelectedCell,
   isEraseMode,
   tileAssets,
+  mode,
 }: SceneCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -121,13 +123,15 @@ function SceneCanvas({
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     drawTiles(ctx)
-    drawGrid(ctx)
+    if (mode === 'edit') {
+      drawGrid(ctx)
+    }
 
-    if (hoverCell) {
+    if (mode === 'edit' && hoverCell) {
       drawHoverCell(ctx, hoverCell.row, hoverCell.col)
     }
 
-    if (selectedCell) {
+    if (mode === 'edit' && selectedCell) {
       drawSelectedCell(ctx, selectedCell.row, selectedCell.col)
     }
   }
@@ -184,10 +188,12 @@ function SceneCanvas({
     const key = `${cell.row}-${cell.col}`
     const currentTile = mapData.cells[key]
 
-    if (isEraseMode || currentTile === selectedTileId) {
-      setMapData((prev) => removeTileAtCell(prev, cell.row, cell.col))
-    } else {
-      setMapData((prev) => setTileAtCell(prev, cell.row, cell.col, selectedTileId))
+    if (mode === 'edit') {
+      if (isEraseMode || currentTile === selectedTileId) {
+        setMapData((prev) => removeTileAtCell(prev, cell.row, cell.col))
+      } else {
+        setMapData((prev) => setTileAtCell(prev, cell.row, cell.col, selectedTileId))
+      }
     }
   }
 
