@@ -23,7 +23,7 @@ function PropertyPanel({
   return (
     <div
       style={{
-        width: 260,
+        width: 270,
         borderLeft: '1px solid #e5e7eb',
         background: '#fafafa',
         padding: 16,
@@ -66,7 +66,9 @@ function PropertyPanel({
         <div>地图行数：{mapData.rows}</div>
         <div>地图列数：{mapData.cols}</div>
         <div>格子大小：{mapData.tileSize}</div>
+        <div>总格子数：{mapData.rows * mapData.cols}</div>
         <div>已放置 tile 数量：{Object.keys(mapData.cells).length}</div>
+        <div>地图行数：{mapData.rows}</div>
       </div>
     </div>
   )

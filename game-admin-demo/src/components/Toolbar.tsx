@@ -1,18 +1,28 @@
 interface ToolbarProps {
   isEraseMode: boolean
+  draftRows: number
+  draftCols: number
+  onDraftRowsChange: (value: number) => void
+  onDraftColsChange: (value: number) => void
   onToggleEraseMode: () => void
   onClearMap: () => void
+  onCreateNewMap: () => void
 }
 
 function Toolbar({
   isEraseMode,
+  draftRows,
+  draftCols,
+  onDraftRowsChange,
+  onDraftColsChange,
   onToggleEraseMode,
   onClearMap,
+  onCreateNewMap,
 }: ToolbarProps) {
   return (
     <div
       style={{
-        height: 64,
+        height: 72,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -20,11 +30,47 @@ function Toolbar({
         borderBottom: '1px solid #e5e7eb',
         background: '#fff',
         flexShrink: 0,
+        gap: 16,
       }}
     >
       <div style={{ fontWeight: 700, fontSize: 18 }}>地图编辑器</div>
 
-      <div style={{ display: 'flex', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <label style={{ fontSize: 14 }}>
+          行数：
+          <input
+            type="number"
+            min={1}
+            value={draftRows}
+            onChange={(e) => onDraftRowsChange(Number(e.target.value))}
+            style={{ marginLeft: 6, width: 70 }}
+          />
+        </label>
+
+        <label style={{ fontSize: 14 }}>
+          列数：
+          <input
+            type="number"
+            min={1}
+            value={draftCols}
+            onChange={(e) => onDraftColsChange(Number(e.target.value))}
+            style={{ marginLeft: 6, width: 70 }}
+          />
+        </label>
+
+        <button
+          onClick={onCreateNewMap}
+          style={{
+            padding: '8px 12px',
+            borderRadius: 6,
+            border: '1px solid #ccc',
+            background: '#fff',
+            cursor: 'pointer',
+          }}
+        >
+          新建地图
+        </button>
+
         <button
           onClick={onToggleEraseMode}
           style={{

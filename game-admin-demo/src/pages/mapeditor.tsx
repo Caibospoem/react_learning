@@ -30,17 +30,34 @@ function MapEditor() {
     createEmptyMapData(ROWS, COLS, TILE_SIZE)
   )
   const [isEraseMode, setIsEraseMode] = useState(false)
+  const [draftRows, setDraftRows] = useState(ROWS)
+  const [draftCols, setDraftCols] = useState(COLS)
+
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Toolbar
         isEraseMode={isEraseMode}
+        draftRows={draftRows}
+        draftCols={draftCols}
+        onDraftRowsChange={setDraftRows}
+        onDraftColsChange={setDraftCols}
         onToggleEraseMode={() => setIsEraseMode((v) => !v)}
         onClearMap={() => {
-          setMapData(
-            createEmptyMapData(mapData.rows, mapData.cols, mapData.tileSize)
-          )
+          setMapData(createEmptyMapData(mapData.rows, mapData.cols, mapData.tileSize))
           setHoverCell(null)
+          setSelectedCell(null)
+        }}
+        onCreateNewMap={() => {
+          const nextRows = Math.max(1, draftRows)
+          const nextCols = Math.max(1, draftCols)
+
+          setMapData(createEmptyMapData(nextRows, nextCols, mapData.tileSize))
+          setHoverCell(null)
+          setSelectedCell(null)
+
+          setDraftRows(nextRows)
+          setDraftCols(nextCols)
         }}
       />
 
