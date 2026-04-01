@@ -33,6 +33,15 @@ function MapEditor() {
   const [draftRows, setDraftRows] = useState(ROWS)
   const [draftCols, setDraftCols] = useState(COLS)
 
+  const [exportedJson, setExportedJson] = useState('')
+  const handleExportJson = () => {
+    const json = JSON.stringify(mapData, null, 2)
+    setExportedJson(json)
+  }
+  const handleCopyJson = async () => {
+    if (!exportedJson) return
+    await navigator.clipboard.writeText(exportedJson)
+  }
 
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -59,6 +68,7 @@ function MapEditor() {
           setDraftRows(nextRows)
           setDraftCols(nextCols)
         }}
+        onExportJson={handleExportJson}
       />
 
       <div style={{ flex: 1, display: 'flex', minHeight: 0 }}>
@@ -92,6 +102,55 @@ function MapEditor() {
             isEraseMode={isEraseMode}
             tileAssets={tileAssets}
           />
+          {exportedJson && (
+            <div
+              style={{
+                marginTop: 16,
+                background: '#fff',
+                border: '1px solid #e5e7eb',
+                borderRadius: 8,
+                padding: 12,
+              }}
+            >
+              <div
+                style={{
+                  height: 72,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0 20px',
+                  borderBottom: '1px solid #e5e7eb',
+                  background: '#fff',
+                  flexShrink: 0,
+                  gap: 16,
+                }}
+              >
+                <h3 style={{ marginTop: 0 }}>导出结果</h3>
+                <button
+                  onClick={handleCopyJson}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: 6,
+                    border: '1px solid #ccc',
+                    background: '#fff',
+                    cursor: 'pointer',
+                  }}
+                  >复制 JSON</button>
+              </div>
+              <textarea
+                value={exportedJson}
+                readOnly
+                style={{
+                  width: '100%',
+                  minHeight: 240,
+                  fontFamily: 'monospace',
+                  fontSize: 13,
+                  lineHeight: 1.6,
+                  resize: 'vertical',
+                }}
+              />
+            </div>
+          )}
         </div>
 
         <PropertyPanel

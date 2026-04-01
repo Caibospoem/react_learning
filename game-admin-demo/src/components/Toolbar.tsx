@@ -7,6 +7,7 @@ interface ToolbarProps {
   onToggleEraseMode: () => void
   onClearMap: () => void
   onCreateNewMap: () => void
+  onExportJson: () => void
 }
 
 function Toolbar({
@@ -18,6 +19,7 @@ function Toolbar({
   onToggleEraseMode,
   onClearMap,
   onCreateNewMap,
+  onExportJson,
 }: ToolbarProps) {
   return (
     <div
@@ -35,6 +37,18 @@ function Toolbar({
     >
       <div style={{ fontWeight: 700, fontSize: 18 }}>地图编辑器</div>
 
+      <button
+        onClick={onExportJson}
+        style={{
+          padding: '8px 12px',
+          borderRadius: 6,
+          border: '1px solid #ccc',
+          background: '#fff',
+          cursor: 'pointer',
+        }}
+      >
+        导出 JSON
+      </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <label style={{ fontSize: 14 }}>
           行数：
