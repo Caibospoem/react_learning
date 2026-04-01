@@ -1,10 +1,10 @@
-import type { MapData } from '../types/map'
+import type { MapData, GridCell } from '../types/map'
 import { getCellKey } from '../utils/map'
 
 interface PropertyPanelProps {
   selectedTileId: string
-  hoverCell: { row: number; col: number } | null
-  selectedCell: { row: number; col: number } | null
+  hoverCell: GridCell | null
+  selectedCell: GridCell | null
   mapData: MapData
   isEraseMode: boolean
 }

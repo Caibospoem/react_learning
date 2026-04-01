@@ -75,7 +75,6 @@ function MapEditor() {
     }
   }
 
-
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Toolbar
