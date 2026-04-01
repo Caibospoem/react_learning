@@ -43,6 +43,43 @@ function MapEditor() {
     await navigator.clipboard.writeText(exportedJson)
   }
   const [mode, setMode] = useState<'edit' | 'preview'>('edit')
+  const [importJson, setImportJson] = useState('')
+  const [importSuccess, setImportSuccess] = useState('')
+  const [importError, setImportError] = useState('')
+
+  const isValidMapData = (data: unknown): data is MapData => {
+    if (!data || typeof data !== 'object') return false
+
+    const value = data as Record<string, unknown>
+
+    if (typeof value.rows !== 'number') return false
+    if (typeof value.cols !== 'number') return false
+    if (typeof value.tileSize !== 'number') return false
+    if (!value.cells || typeof value.cells !== 'object') return false
+
+    return true
+  }
+
+  const handleImportJson = () => {
+    try {
+      const parsed = JSON.parse(importJson)
+
+      if (!isValidMapData(parsed)) {
+        setImportError('JSON 结构不符合 MapData 要求')
+        return
+      }
+
+      setMapData(parsed)
+      setDraftRows(parsed.rows)
+      setDraftCols(parsed.cols)
+      setHoverCell(null)
+      setSelectedCell(null)
+      setImportError('')
+      setImportSuccess('地图恢复成功')
+    } catch (error) {
+      setImportError('JSON 解析失败，请检查格式是否正确')
+    }
+  }
 
 
   return (
@@ -158,6 +195,74 @@ function MapEditor() {
                   />
                 </div>
               )}
+              <div
+                style={{
+                  marginTop: 16,
+                  background: '#fff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: 8,
+                  padding: 12,
+                }}
+              >
+                <h3 style={{ marginTop: 0 }}>从 JSON 恢复地图</h3>
+
+                <textarea
+                  value={importJson}
+                  onChange={(e) => setImportJson(e.target.value)}
+                  placeholder="把导出的地图 JSON 粘贴到这里"
+                  style={{
+                    width: '100%',
+                    minHeight: 220,
+                    fontFamily: 'monospace',
+                    fontSize: 13,
+                    lineHeight: 1.6,
+                    resize: 'vertical',
+                  }}
+                />
+
+                <div style={{ marginTop: 12, display: 'flex', gap: 12 }}>
+                  <button
+                    onClick={handleImportJson}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 6,
+                      border: '1px solid #ccc',
+                      background: '#fff',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    恢复地图
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setImportJson(exportedJson)
+                      setImportError('')
+                      setImportSuccess('')
+                    }}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 6,
+                      border: '1px solid #ccc',
+                      background: '#fff',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    填入当前导出结果
+                  </button>
+                </div>
+                {importSuccess && (
+                  <p style={{ marginTop: 12, color: '#389e0d', fontSize: 14 }}>
+                    {importSuccess}
+                  </p>
+                )}
+                {importError && (
+                  <p style={{ marginTop: 12, color: '#cf1322', fontSize: 14 }}>
+                    {importError}
+                  </p>
+                )}
+
+              </div>
             </div>
 
             <PropertyPanel
