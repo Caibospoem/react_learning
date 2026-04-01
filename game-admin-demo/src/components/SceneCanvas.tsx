@@ -14,6 +14,7 @@ interface SceneCanvasProps {
   isEraseMode: boolean
   tileAssets: TileAsset[]
   mode: 'edit' | 'preview'
+  showGrid: boolean
 }
 
 function SceneCanvas({
@@ -27,6 +28,7 @@ function SceneCanvas({
   isEraseMode,
   tileAssets,
   mode,
+  showGrid,
 }: SceneCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
@@ -55,7 +57,7 @@ function SceneCanvas({
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     drawTiles(ctx, mapData, imageMap)
-    if (mode === 'edit') {
+    if (showGrid && mode === 'edit') {
       drawGrid(ctx, mapData)
     }
 
@@ -128,6 +130,15 @@ function SceneCanvas({
       }
     }
   }
+  const handleCanvasRightClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    event.preventDefault()  // 阻止默认的右键菜单弹出
+
+    const cell = getGridCellFromMouseEvent(event)
+    if (!cell) return
+
+    setSelectedCell(cell)
+    setMapData((prev) => removeTileAtCell(prev, cell.row, cell.col))
+  }
 
   const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
     const cell = getGridCellFromMouseEvent(event)
@@ -140,6 +151,7 @@ function SceneCanvas({
       width={mapData.cols * mapData.tileSize}
       height={mapData.rows * mapData.tileSize}
       onClick={handleCanvasClick}
+      onContextMenu={handleCanvasRightClick}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoverCell(null)}
       style={{

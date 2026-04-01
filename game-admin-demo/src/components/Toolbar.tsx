@@ -10,6 +10,8 @@ interface ToolbarProps {
   onExportJson: () => void
   mode: 'edit' | 'preview'
   onToggleMode: () => void
+  showGrid: boolean
+  setShowGrid: (value: boolean) => void
 }
 
 function Toolbar({
@@ -23,7 +25,9 @@ function Toolbar({
   onCreateNewMap,
   onExportJson,
   mode,
-  onToggleMode
+  onToggleMode,
+  showGrid,
+  setShowGrid,
 
 }: ToolbarProps) {
   return (
@@ -56,16 +60,29 @@ function Toolbar({
       </button>
       <button 
         onClick={onToggleMode}
-          style={{
-            padding: '8px 12px',
-            borderRadius: 6,
-            border: '1px solid #ccc',
-            background: mode === 'preview' ? '#fff1f0' : '#f6ffed',
-            color: mode === 'preview' ? '#cf1322' : '#389e0d',
-            cursor: 'pointer',
-          }}
-        >
+        style={{
+          padding: '8px 12px',
+          borderRadius: 6,
+          border: '1px solid #ccc',
+          background: mode === 'preview' ? '#fff1f0' : '#f6ffed',
+          color: mode === 'preview' ? '#cf1322' : '#389e0d',
+          cursor: 'pointer',
+        }}
+      >
         {mode === 'edit' ? '进入预览模式' : '返回编辑模式'}
+      </button>
+      <button 
+        onClick={() => setShowGrid(!showGrid)}
+        style={{
+          padding: '8px 12px',
+          borderRadius: 6,
+          border: '1px solid #ccc',
+          background: !showGrid ? '#fff1f0' : '#f6ffed',
+          color: !showGrid ? '#cf1322' : '#389e0d',
+          cursor: 'pointer',
+        }}
+      >
+        {showGrid ? '隐藏网格' : '显示网格'}
       </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
         <label style={{ fontSize: 14 }}>

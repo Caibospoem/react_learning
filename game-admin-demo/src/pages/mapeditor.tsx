@@ -41,6 +41,8 @@ function MapEditor() {
   const [importSuccess, setImportSuccess] = useState('')
   const [importError, setImportError] = useState('')
 
+  const [showGrid, setShowGrid] = useState(true)
+
   const isValidMapData = (data: unknown): data is MapData => {
     if (!data || typeof data !== 'object') return false
 
@@ -85,11 +87,15 @@ function MapEditor() {
         onDraftColsChange={setDraftCols}
         onToggleEraseMode={() => setIsEraseMode((v) => !v)}
         onClearMap={() => {
+          const comfirmClear = window.confirm('确定要清空地图吗？此操作不可撤销')
+          if (!comfirmClear) return
           setMapData(createEmptyMapData(mapData.rows, mapData.cols, mapData.tileSize))
           setHoverCell(null)
           setSelectedCell(null)
         }}
         onCreateNewMap={() => {
+          const comfirmCreate = window.confirm('确定要创建新地图吗？此操作会丢失当前未保存的编辑内容')
+          if (!comfirmCreate) return
           const nextRows = Math.max(1, draftRows)
           const nextCols = Math.max(1, draftCols)
 
@@ -103,7 +109,8 @@ function MapEditor() {
         onExportJson={handleExportJson}
         mode={mode}
         onToggleMode={() => setMode((m) => (m === 'edit' ? 'preview' : 'edit'))}
-        
+        showGrid={showGrid}
+        setShowGrid={setShowGrid}
       />
       {
         mode === 'edit' ? (
@@ -138,6 +145,7 @@ function MapEditor() {
                 isEraseMode={isEraseMode}
                 tileAssets={tileAssets}
                 mode={mode}
+                showGrid={showGrid}
               />
               {exportedJson && (
                 <div
@@ -243,6 +251,22 @@ function MapEditor() {
                   >
                     填入当前导出结果
                   </button>
+
+                  <button 
+                    onClick={() => {
+                      setImportJson('')
+                      setImportError('')
+                    }}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 6,
+                      border: '1px solid #ccc',
+                      background: '#fff',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    清空输入
+                  </button>
                 </div>
                 {importSuccess && (
                   <p style={{ marginTop: 12, color: '#389e0d', fontSize: 14 }}>
@@ -288,6 +312,7 @@ function MapEditor() {
                 isEraseMode={isEraseMode}
                 tileAssets={tileAssets}
                 mode={mode}
+                showGrid={showGrid}
               />
             </div>
           </div>
