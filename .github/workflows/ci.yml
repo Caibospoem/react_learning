@@ -72,11 +72,34 @@ jobs:
       - name: Run Build
         run: pnpm build
 
+  go-task:
+    name: Go Task Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: game_admin_go_task
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache-dependency-path: game_admin_go_task/go.mod
+
+      - name: Go Format Check
+        run: test -z "$(gofmt -l .)"
+
+      - name: Go Build
+        run: go build ./...
+
   docker:
     name: Docker Build Check
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [backend, frontend]
+    needs: [backend, frontend, go-task]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -92,3 +115,6 @@ jobs:
 
       - name: Build Frontend Image
         run: docker build -t re-frontend-ci ./game-admin-demo
+
+      - name: Build Go Task Image
+        run: docker build -t re-go-task-ci ./game_admin_go_task

@@ -24,6 +24,16 @@ services:
     volumes:
       - backend_data:/app/data
 
+  go-task:
+    build:
+      context: ./game_admin_go_task
+    container_name: game-admin-go-task
+    restart: unless-stopped
+    depends_on:
+      - redis
+    ports:
+      - "8081:8081"
+
   frontend:
     build:
       context: ./game-admin-demo

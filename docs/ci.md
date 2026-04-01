@@ -1,50 +1,21 @@
 # CI Guide
 
-## Workflow File
+## Workflow
 - `.github/workflows/ci.yml`
 
-## Trigger Rules
-- Runs on every pull request.
-- Runs on push to:
-  - `main`
-  - `develop`
-  - `feature/**`
+## Trigger
+- pull request
+- push to `main`, `develop`, `feature/**`
 
 ## Jobs
-1. `Backend Test`
-- Install backend dev dependencies from `requirements-dev.txt`.
-- Run `python -m pytest -q`.
+1. `Backend Test`: install backend dev deps + `pytest`.
+2. `Frontend Lint Test Build`: `pnpm lint/test/build`.
+3. `Go Task Build`: `gofmt` check + `go build`.
+4. `Docker Build Check`: compose validation + image builds.
 
-2. `Frontend Lint Test Build`
-- Install frontend dependencies with pnpm.
-- Run:
-  - `pnpm lint`
-  - `pnpm test`
-  - `pnpm build`
-
-3. `Docker Build Check`
-- Validate `docker-compose.yml` via `docker compose config`.
-- Build:
-  - backend image from `game_admin_backend`
-  - frontend image from `game-admin-demo`
-
-## Suggested Branch Protection
-Set these required checks for `develop` and `main`:
+## Suggested Required Checks
+Set these checks as required on protected branches:
 - `Backend Test`
 - `Frontend Lint Test Build`
+- `Go Task Build`
 - `Docker Build Check`
-
-## Local Pre-check (before pushing)
-Backend:
-```bash
-cd E:\project\re\game_admin_backend
-python -m pytest -q
-```
-
-Frontend:
-```bash
-cd E:\project\re\game-admin-demo
-corepack pnpm lint
-corepack pnpm test
-corepack pnpm build
-```
