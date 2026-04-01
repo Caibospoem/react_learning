@@ -1,83 +1,112 @@
-26.3.30更新
+# AI Game Admin Demo
 
-优化格子高亮页：
+一个前后端分离的游戏创作平台 Demo，当前已完成阶段四工程化建设：
+- 前后端容器化（Docker）
+- 一键编排（Docker Compose）
+- 自动化测试（pytest + vitest）
+- CI 流水线（GitHub Actions）
 
-​	现在可以实时反应鼠标选中的位置信息啦！
+## 项目结构
+```text
+.
+├─ game-admin-demo/         # React + TypeScript + Vite 前端
+├─ game_admin_backend/      # FastAPI 后端
+├─ .github/workflows/       # CI 配置
+├─ docs/
+│  ├─ docker-compose.md     # 容器运行说明
+│  ├─ testing.md            # 测试说明
+│  ├─ ci.md                 # CI 说明
+│  └─ review-checklist.md   # 代码评审清单
+├─ docker-compose.yml       # 一键启动 frontend + backend + redis
+└─ CONTRIBUTING.md          # 分支与协作规范
+```
 
-新增图形编辑页：
+## 功能概览
+- 登录认证（JWT）
+- 项目管理（CRUD）
+- 资源上传
+- 异步任务状态流转（排队中 -> 进行中 -> 成功）
+- 地图编辑器（网格绘制、预览、导入导出 JSON）
 
-​	临时建立一个简单的数据模型，通过选择对象，点击地图放置对象。
+## 本地开发启动
+### 后端
+```bash
+cd E:\project\re\game_admin_backend
+python -m pip install -r requirements.txt
+python run.py
+```
 
+### 前端
+```bash
+cd E:\project\re\game-admin-demo
+corepack pnpm install
+corepack pnpm dev
+```
 
+默认访问：
+- 前端：`http://127.0.0.1:5173`
+- 后端 Swagger：`http://127.0.0.1:8000/docs`
 
-26.3.31更新
+默认账号：
+- 用户名：`bocai`
+- 密码：`123456`
 
-优化地图数据格式：
+## Docker 一键启动
+```bash
+cd E:\project\re
+docker compose up --build -d
+```
 
-​	新建地图数据type，使用MapData进行渲染地图。
+查看状态：
+```bash
+docker compose ps
+docker compose logs -f backend
+docker compose logs -f frontend
+```
 
-添加新的功能：
+停止：
+```bash
+docker compose down
+```
 
-​	现在可以选择绘制模式 or 清除模式来进行地图的绘制和清除。
+完整说明见：
+- [docs/docker-compose.md](docs/docker-compose.md)
+- [docs/deployment.md](docs/deployment.md)
 
-​	就算在绘制模式的情况下也可以通过第二次点击来进行图形清除。
+## 测试与质量
+### 后端测试
+```bash
+cd E:\project\re\game_admin_backend
+python -m pip install -r requirements-dev.txt
+python -m pytest -q
+```
 
-​	添加清空地图功能，点击清除地图就可以新建一张新的地图。
+### 前端测试与构建
+```bash
+cd E:\project\re\game-admin-demo
+corepack pnpm lint
+corepack pnpm test
+corepack pnpm build
+```
 
-​	清空地图时同时清空hover并显示未选中。
+说明：
+- 当前 ESLint 有 3 条 `react-hooks/exhaustive-deps` 警告，不阻断构建。
 
+## CI
+工作流文件：
+- `.github/workflows/ci.yml`
 
+包含检查：
+- Backend Test
+- Frontend Lint Test Build
+- Docker Build Check
 
+详细见：
+- [docs/ci.md](docs/ci.md)
 
-目前进度：
+## 面试讲解提纲
+- [docs/interview-talk-track.md](docs/interview-talk-track.md)
 
-​	已经做出了一个 2D 地图编辑器的雏形。它支持网格绘制、素材选择、点击摆放、擦除、hover 和选中格子显示。项目内部使用 MapData 作为地图数据模型，Canvas 根据 MapData 进行重绘，符合数据驱动渲染的编辑器思路。
-
-
-
-26.3.31第二次更新
-
-分离地图编辑器组件：
-
-​	Tool bar（顶部工具栏）：切换编辑模式、清空地图
-
-​	Asset Panel（左侧素材面板）：展示素材列表、切换当前选中素材
-
-​	Scene Canvas（中间画布）：canvas 绘制、点击格子、hover 格子、更新地图数据
-
-​	Property Panel（右侧属性面板）：显示当前素材、显示 hover 格子、显示地图信息
-
-优化Asset Panel：
-
-​	添加了描述信息，并且现在可以显示素材的预览图啦！
-
-
-
-26.4.1
-
-自定义地图大小：
-
-​	新建地图前选择地图的大小
-
-添加地图预览模式：
-
-​	进入预览模式后目前不能进行任何操作
-
-​	去除网格线
-
-导出和导入地图数据：
-
-​	点击导出JSON导出地图数据，下面可预览
-
-​	可以将地图数据粘贴至恢复地图数据栏，点击恢复地图。如果是合法数据则恢复地图
-
-优化用户体验：
-
-​	选择是否显示网格
-
-​	右键可以删除元素
-
-​	新建和清空地图时弹出警告确认
-
-
-
+## 协作规范
+- 分支与提交流程见 [CONTRIBUTING.md](CONTRIBUTING.md)
+- 评审清单见 [docs/review-checklist.md](docs/review-checklist.md)

@@ -14,9 +14,9 @@ Run tests:
 python -m pytest -q
 ```
 
-Covered in current suite:
+Current backend coverage:
 - Auth login success/failure
-- Project API auth gate and CRUD flow
+- Project API auth gate + CRUD flow
 - Task status transition (`排队中 -> 进行中 -> 成功`)
 
 ## Frontend Tests (`vitest`)
@@ -25,18 +25,18 @@ Working directory:
 
 Install dependencies:
 ```bash
-pnpm install
+corepack pnpm install
 ```
 
 Run tests:
 ```bash
-pnpm test
+corepack pnpm test
 ```
 
 Run watch mode:
 ```bash
-pnpm test:watch
+corepack pnpm test:watch
 ```
 
-Covered in current suite:
-- Map utility functions (`create/set/remove/getKey`)
+Current frontend coverage:
+- Map utility functions (`create/set/remove/getCellKey`)
