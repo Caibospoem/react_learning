@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import MapPreviewCanvas from "../components/MapPreviewCanvas";
 import { getProjectsApi } from "../services/projectApi";
 import { getRuntimeApi } from "../services/systemApi";
@@ -6,6 +7,7 @@ import { getStudioVersionsApi } from "../services/studioApi";
 import { createGenerateTaskApi, getStudioTaskDetailApi, getStudioTasksApi } from "../services/taskApi";
 import type { Project, StudioTask, StudioVersion } from "../types";
 import { getActiveProjectId, PROJECT_CHANGED_EVENT, setActiveProjectId } from "../utils/activeProject";
+import { setMapEditorImportPayload } from "../utils/mapEditorBridge";
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
@@ -16,6 +18,7 @@ type ChatMessage = {
 };
 
 function StudioPage() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProjectId, setProjectId] = useState<number | null>(getActiveProjectId());
   const [prompt, setPrompt] = useState("帮我生成一个 2D 横版关卡");
@@ -141,6 +144,26 @@ function StudioPage() {
     }
   };
 
+  const handleEditInMapEditor = () => {
+    if (!activeProjectId || !latestVersion) {
+      return;
+    }
+    setMapEditorImportPayload({
+      mapData: {
+        rows: latestVersion.map_data.rows,
+        cols: latestVersion.map_data.cols,
+        tileSize: latestVersion.map_data.tileSize,
+        cells: latestVersion.map_data.cells,
+      },
+      source: {
+        projectId: activeProjectId,
+        versionId: latestVersion.id,
+        prompt: latestVersion.prompt,
+      },
+    });
+    navigate("/mapeditor");
+  };
+
   return (
     <div className="studio-grid">
       <section className="panel">
@@ -187,6 +210,16 @@ function StudioPage() {
           <span className="muted">{latestVersion ? `Version #${latestVersion.id}` : "No version"}</span>
         </div>
         <MapPreviewCanvas mapData={latestVersion?.map_data ?? null} />
+        <div className="toolbar" style={{ marginTop: 12 }}>
+          <button
+            className="btn"
+            disabled={!latestVersion}
+            onClick={handleEditInMapEditor}
+            title={latestVersion ? "Open this generated map in editor" : "Generate map first"}
+          >
+            Edit Latest Generated Map
+          </button>
+        </div>
       </section>
 
       <section className="panel">

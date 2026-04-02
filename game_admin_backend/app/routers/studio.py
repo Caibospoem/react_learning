@@ -9,6 +9,7 @@ from app.schemas.project import ProjectResponse
 from app.schemas.studio import (
     PipelineTaskResponse,
     StudioGenerateRequest,
+    StudioVersionCreate,
     StudioProjectCloneRequest,
     StudioProjectCreate,
     StudioProjectStatusUpdate,
@@ -28,7 +29,7 @@ from app.services.project_service import (
     list_projects,
     update_project_status,
 )
-from app.services.studio_service import list_studio_versions, serialize_studio_version
+from app.services.studio_service import create_studio_version, list_studio_versions, serialize_studio_version
 
 router = APIRouter(prefix="/studio", tags=["studio"], dependencies=[Depends(get_current_user)])
 
@@ -74,6 +75,13 @@ def get_project_versions(project_id: int, db: Session = Depends(get_db)):
     get_project_or_404(db, project_id)
     versions = list_studio_versions(db, project_id)
     return [serialize_studio_version(version) for version in versions]
+
+
+@router.post("/projects/{project_id}/versions", response_model=StudioVersionResponse, status_code=status.HTTP_201_CREATED)
+def post_project_version(project_id: int, data: StudioVersionCreate, db: Session = Depends(get_db)):
+    get_project_or_404(db, project_id)
+    version = create_studio_version(db, project_id, data)
+    return serialize_studio_version(version)
 
 
 @router.post("/projects/{project_id}/generate", response_model=PipelineTaskResponse, status_code=status.HTTP_202_ACCEPTED)

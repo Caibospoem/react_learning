@@ -61,7 +61,7 @@ export type GeneratedMap = {
   rows: number;
   cols: number;
   tileSize: number;
-  cells: Record<string, string>;
+  cells: Record<string, string | number>;
 };
 
 export type StudioVersion = {
@@ -79,3 +79,13 @@ export type StudioVersion = {
   created_at: string;
 };
 
+export type StudioVersionSaveRequest = {
+  prompt: string;
+  summary: string;
+  map_data: GeneratedMap;
+  asset_manifest: Array<{
+    name: string;
+    type: string;
+    usage: string;
+  }>;
+};

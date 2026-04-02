@@ -34,6 +34,20 @@ class StudioTaskCreate(BaseModel):
     payload: dict[str, Any] = Field(default_factory=dict)
 
 
+class StudioMapData(BaseModel):
+    rows: int
+    cols: int
+    tileSize: int
+    cells: dict[str, str | int] = Field(default_factory=dict)
+
+
+class StudioVersionCreate(BaseModel):
+    prompt: str = "Edited in map editor"
+    summary: str = "Manual map save"
+    map_data: StudioMapData
+    asset_manifest: list[dict[str, Any]] = Field(default_factory=list)
+
+
 class PipelineTaskResponse(BaseModel):
     id: int
     project_id: int | None = None
@@ -56,4 +70,3 @@ class StudioVersionResponse(BaseModel):
     map_data: dict[str, Any]
     asset_manifest: list[dict[str, Any]] = Field(default_factory=list)
     created_at: datetime
-

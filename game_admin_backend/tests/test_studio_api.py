@@ -148,3 +148,38 @@ def test_system_runtime_exposes_mock_mode(client):
     assert runtime_response.status_code == 200
     payload = runtime_response.json()
     assert payload["ai_mode"] == "mock"
+
+
+def test_save_editor_map_as_version(client, auth_headers):
+    project_response = client.post(
+        "/api/studio/projects",
+        headers=auth_headers,
+        json={"name": "Editor Save", "description": "editor", "owner": "bocai"},
+    )
+    assert project_response.status_code == 201
+    project_id = project_response.json()["id"]
+
+    save_response = client.post(
+        f"/api/studio/projects/{project_id}/versions",
+        headers=auth_headers,
+        json={
+            "prompt": "编辑器保存",
+            "summary": "手动编辑后保存",
+            "map_data": {
+                "rows": 12,
+                "cols": 18,
+                "tileSize": 24,
+                "cells": {"11-0": "ground", "11-1": "ground"},
+            },
+            "asset_manifest": [],
+        },
+    )
+    assert save_response.status_code == 201
+    body = save_response.json()
+    assert body["summary"] == "手动编辑后保存"
+    assert body["map_data"]["rows"] == 12
+
+    list_response = client.get(f"/api/studio/projects/{project_id}/versions", headers=auth_headers)
+    assert list_response.status_code == 200
+    versions = list_response.json()
+    assert len(versions) >= 1

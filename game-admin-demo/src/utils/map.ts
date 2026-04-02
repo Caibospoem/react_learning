@@ -45,3 +45,13 @@ export const removeTileAtCell = (
     cells: nextCells,
   }
 }
+
+export const isMapData = (data: unknown): data is MapData => {
+  if (!data || typeof data !== 'object') return false
+  const value = data as Record<string, unknown>
+  if (typeof value.rows !== 'number') return false
+  if (typeof value.cols !== 'number') return false
+  if (typeof value.tileSize !== 'number') return false
+  if (!value.cells || typeof value.cells !== 'object') return false
+  return true
+}

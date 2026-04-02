@@ -72,7 +72,7 @@ function SceneCanvas({
 
   useEffect(() => {
     redraw()
-  }, [mapData, imageMap, hoverCell, selectedCell])
+  }, [mapData, imageMap, hoverCell, selectedCell, mode, showGrid])
 
   useEffect(() => {
     const images = Object.values(imageMap)
