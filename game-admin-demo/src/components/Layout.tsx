@@ -1,30 +1,52 @@
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { getRuntimeApi } from "../services/systemApi";
+import ProjectSwitcher from "./ProjectSwitcher";
 
 function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const username = localStorage.getItem("username") ?? "bocai";
+  const [runtimeMode, setRuntimeMode] = useState("...");
 
   const menuList = [
-    { path: "/projects", label: "项目管理" },
-    { path: "/assets", label: "资源管理" },
-    { path: "/tasks", label: "任务中心" },
-    { path: "/convas", label: "Canvas 编辑" },
-    { path: "/gridhightlight", label: "格子高亮" },
-    { path: "/mapeditor", label: "地图编辑器" },
+    { path: "/studio", label: "AI Studio" },
+    { path: "/projects", label: "Project Management" },
+    { path: "/assets", label: "Asset Management" },
+    { path: "/tasks", label: "Task Scheduler" },
+    { path: "/mapeditor", label: "Map Editor" },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("activeProjectId");
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    const loadRuntime = async () => {
+      try {
+        const runtime = await getRuntimeApi();
+        setRuntimeMode(runtime.ai_mode);
+      } catch (error) {
+        console.error(error);
+        setRuntimeMode("unknown");
+      }
+    };
+    void loadRuntime();
+  }, []);
 
   return (
     <div className="layout">
       <aside className="sidebar">
-        <h2 className="logo">Game Admin</h2>
+        <h2 className="logo">AI Game Studio</h2>
         <nav className="menu">
           {menuList.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={
-                location.pathname === item.path ? "menu-item active" : "menu-item"
-              }
+              className={location.pathname === item.path ? "menu-item active" : "menu-item"}
             >
               {item.label}
             </Link>
@@ -34,8 +56,14 @@ function Layout() {
 
       <main className="content">
         <header className="topbar">
-          <span>游戏平台后台管理 Demo</span>
-          <span>当前用户：{username}</span>
+          <ProjectSwitcher />
+          <div className="topbar-actions">
+            <span className="status-tag">AI Mode: {runtimeMode}</span>
+            <span className="muted">User: {username}</span>
+            <button className="btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </header>
         <div className="page-body">
           <Outlet />

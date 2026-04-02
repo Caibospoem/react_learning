@@ -1,6 +1,7 @@
 from app.schemas.asset import AssetResponse
 from app.schemas.auth import LoginRequest, TokenResponse
 from app.schemas.project import ProjectCreate, ProjectResponse, ProjectUpdate
+from app.schemas.studio import PipelineTaskResponse, StudioVersionResponse
 from app.schemas.task import TaskCreate, TaskResponse
 
 __all__ = [
@@ -12,4 +13,6 @@ __all__ = [
     "AssetResponse",
     "TaskCreate",
     "TaskResponse",
+    "PipelineTaskResponse",
+    "StudioVersionResponse",
 ]
