@@ -1,66 +1,140 @@
 import { useEffect, useState } from "react";
-import StatusTag from "../components/StatusTag";
-import { createTaskApi, getTasksApi } from "../services/taskApi";
-import type { Task } from "../types";
+import { createStudioTaskApi, getStudioTasksApi } from "../services/taskApi";
+import type { StudioTask, StudioTaskType } from "../types";
+import { getActiveProjectId, PROJECT_CHANGED_EVENT } from "../utils/activeProject";
 
 function TaskPage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<StudioTask[]>([]);
+  const [activeProjectId, setActiveProjectId] = useState<number | null>(getActiveProjectId());
+  const [prompt, setPrompt] = useState("帮我生成一个 2D 横版关卡");
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  const fetchTasks = async () => {
+  const loadTasks = async () => {
+    if (!activeProjectId) {
+      setTasks([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     try {
-      const data = await getTasksApi();
-      setTasks(data);
+      const list = await getStudioTasksApi(activeProjectId);
+      setTasks(list);
     } catch (error) {
       console.error(error);
-      alert("获取任务列表失败");
+      alert("Failed to load tasks.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTasks();
+    void loadTasks();
+  }, [activeProjectId]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      void loadTasks();
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [activeProjectId]);
+
+  useEffect(() => {
+    const onProjectChanged = () => setActiveProjectId(getActiveProjectId());
+    window.addEventListener(PROJECT_CHANGED_EVENT, onProjectChanged as EventListener);
+    return () =>
+      window.removeEventListener(PROJECT_CHANGED_EVENT, onProjectChanged as EventListener);
   }, []);
 
-  const handleCreateTask = async () => {
+  const handleCreateTask = async (taskType: StudioTaskType) => {
+    if (!activeProjectId) {
+      alert("Please select a project first.");
+      return;
+    }
+    setSubmitting(true);
     try {
-      await createTaskApi({ name: "打包 Web 试玩版" });
-      alert("任务已创建");
-      fetchTasks();
+      await createStudioTaskApi({
+        projectId: activeProjectId,
+        taskType,
+        prompt: taskType === "GENERATE_MAP" ? prompt : undefined,
+      });
+      await loadTasks();
     } catch (error) {
       console.error(error);
-      alert("创建任务失败");
+      alert("Create task failed.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <div>加载中...</div>;
+    return <div>Loading tasks...</div>;
   }
 
   return (
     <div>
       <div className="page-header">
-        <h1>任务中心</h1>
-        <button className="btn primary" onClick={handleCreateTask}>
-          创建任务
-        </button>
+        <h1>任务调度中心</h1>
+      </div>
+
+      <div className="panel">
+        <div className="panel-header">
+          <h2>Trigger Async Jobs</h2>
+        </div>
+        <div className="toolbar">
+          <input
+            className="input grow"
+            value={prompt}
+            onChange={(event) => setPrompt(event.target.value)}
+            placeholder="Prompt for map generation"
+          />
+          <button
+            className="btn primary"
+            onClick={() => void handleCreateTask("GENERATE_MAP")}
+            disabled={submitting}
+          >
+            Generate Map
+          </button>
+          <button
+            className="btn"
+            onClick={() => void handleCreateTask("PACKAGE_BUILD")}
+            disabled={submitting}
+          >
+            Package
+          </button>
+          <button
+            className="btn"
+            onClick={() => void handleCreateTask("PUBLISH_RELEASE")}
+            disabled={submitting}
+          >
+            Publish
+          </button>
+        </div>
       </div>
 
       <div className="table">
-        <div className="table-row table-head">
-          <span>任务名称</span>
-          <span>状态</span>
-          <span>创建时间</span>
+        <div className="table-row table-head task-row">
+          <span>ID</span>
+          <span>Type</span>
+          <span>Status</span>
+          <span>Progress</span>
+          <span>Updated</span>
+          <span>Result/Error</span>
         </div>
-
         {tasks.map((task) => (
-          <div key={task.id} className="table-row">
-            <span>{task.name}</span>
-            <span>
-              <StatusTag text={task.status} />
+          <div key={task.id} className="table-row task-row">
+            <span>{task.id}</span>
+            <span>{task.task_type}</span>
+            <span>{task.status}</span>
+            <span>{task.progress}%</span>
+            <span>{new Date(task.updated_at).toLocaleString()}</span>
+            <span className="muted">
+              {task.error
+                ? task.error
+                : task.result
+                  ? JSON.stringify(task.result)
+                  : "Running..."}
             </span>
-            <span>{task.createdAt ?? "-"}</span>
           </div>
         ))}
       </div>
@@ -69,3 +143,4 @@ function TaskPage() {
 }
 
 export default TaskPage;
+

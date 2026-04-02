@@ -10,6 +10,9 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./game_admin.db"
     redis_url: str = "redis://localhost:6379/0"
     upload_dir: str = "app/storage/uploads"
+    ai_mode: str = "mock"
+    ai_provider: str = "none"
+    ai_model: str = "mock-level-generator"
 
     class Config:
         env_file = ".env"

@@ -1,21 +1,36 @@
+import type { StudioTask, StudioTaskType } from "../types";
 import http from "./http";
-import type { Task } from "../types";
 
-export type CreateTaskRequest = {
-  name: string;
-};
-
-export const getTasksApi = async () => {
-  const res = await http.get<Task[]>("/tasks");
+export const getStudioTasksApi = async (projectId?: number) => {
+  const res = await http.get<StudioTask[]>("/studio/tasks", {
+    params: projectId ? { project_id: projectId } : undefined,
+  });
   return res.data;
 };
 
-export const getTaskDetailApi = async (taskId: number) => {
-  const res = await http.get<Task>(`/tasks/${taskId}`);
+export const getStudioTaskDetailApi = async (taskId: number) => {
+  const res = await http.get<StudioTask>(`/studio/tasks/${taskId}`);
   return res.data;
 };
 
-export const createTaskApi = async (data: CreateTaskRequest) => {
-  const res = await http.post<Task>("/tasks", data);
+export const createStudioTaskApi = async (params: {
+  projectId: number;
+  taskType: StudioTaskType;
+  prompt?: string;
+  payload?: Record<string, unknown>;
+}) => {
+  const res = await http.post<StudioTask>(`/studio/projects/${params.projectId}/tasks`, {
+    task_type: params.taskType,
+    prompt: params.prompt,
+    payload: params.payload ?? {},
+  });
   return res.data;
 };
+
+export const createGenerateTaskApi = async (projectId: number, prompt: string) => {
+  const res = await http.post<StudioTask>(`/studio/projects/${projectId}/generate`, {
+    prompt,
+  });
+  return res.data;
+};
+
